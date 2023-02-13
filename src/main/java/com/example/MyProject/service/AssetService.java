@@ -1,5 +1,6 @@
 package com.example.MyProject.service;
 
+import com.example.MyProject.controller.DTO.AssetDTO;
 import com.example.MyProject.model.AssetModel;
 import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.repo.AssetRepo;
@@ -8,7 +9,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -40,6 +40,12 @@ public class AssetService {
         AssetModel asset = assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found"));
         asset.setIsActive(!asset.getIsActive());
         assetRepo.save(asset);
+    }
+
+    public String createAsset(AssetDTO requestedAsset){
+        AssetModel asset = new AssetModel(requestedAsset.getName(), requestedAsset.getPerimeter());
+        assetRepo.save(asset);
+        return asset.getName();
     }
 
     /*public void deleteAssetByName(String name){

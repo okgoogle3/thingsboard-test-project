@@ -1,5 +1,6 @@
 package com.example.MyProject.controller;
 
+import com.example.MyProject.controller.DTO.AssetDTO;
 import com.example.MyProject.model.AssetModel;
 import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.repo.AssetRepo;
@@ -35,9 +36,13 @@ public class AssetController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> createAsset() {
-        assetRepo.save(new AssetModel("aboba", true));
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> createAsset(@RequestBody AssetDTO asset) {
+        try {
+            String location = String.format("/asset/%s", assetService.createAsset(asset));
+            return ResponseEntity.created(URI.create(location)).build();
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/{name}")

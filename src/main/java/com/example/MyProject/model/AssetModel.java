@@ -29,10 +29,11 @@ public class AssetModel {
     @OneToMany(mappedBy = "relatedAsset", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<DeviceModel> device = new ArrayList<>();
 
-    public AssetModel(String name, boolean isActive) {
+    public AssetModel(String name, String perimeter) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
-        this.isActive = isActive;
+        this.perimeter = perimeter;
+        this.isActive = false;
     }
 
     public AssetModel(String name, Boolean isActive, List<DeviceModel> device) {
