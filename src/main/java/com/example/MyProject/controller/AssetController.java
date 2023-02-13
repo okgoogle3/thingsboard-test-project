@@ -6,6 +6,7 @@ import com.example.MyProject.repo.AssetRepo;
 import com.example.MyProject.repo.DeviceRepo;
 import com.example.MyProject.service.AssetService;
 import com.example.MyProject.service.DeviceService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,16 +34,30 @@ public class AssetController {
         return ResponseEntity.ok(assetService.getAllActiveAssets());
     }
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<Void> createAsset() {
         assetRepo.save(new AssetModel("aboba", true));
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{name}")
+    public ResponseEntity<Void> changeActivityState(@PathVariable String name){
+        try {
+            assetService.changeActivityState(name);
+            return ResponseEntity.ok().build();
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{name}")
     public ResponseEntity<Void> deleteAsset(@PathVariable String name){
-        assetService.deleteAssetByName(name);
-        return ResponseEntity.ok().build();
+        try {
+            assetService.deleteAssetByName(name);
+            return ResponseEntity.ok().build();
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
     }
     /*@GetMapping
     public ResponseEntity<List<Device>> getAllArticles() {

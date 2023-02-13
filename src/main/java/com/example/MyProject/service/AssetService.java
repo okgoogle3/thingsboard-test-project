@@ -36,6 +36,12 @@ public class AssetService {
         assetRepo.delete(asset);
     }
 
+    public void changeActivityState(String name){
+        AssetModel asset = assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found"));
+        asset.setIsActive(!asset.getIsActive());
+        assetRepo.save(asset);
+    }
+
     /*public void deleteAssetByName(String name){
         assetRepo.delete(assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found")));
     }*/

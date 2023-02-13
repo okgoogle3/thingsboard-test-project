@@ -1,5 +1,6 @@
 package com.example.MyProject.model;
 
+import com.example.MyProject.model.CompositeKey.TelemetryId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,14 +12,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "telemetry")
+@IdClass(TelemetryId.class)
 public class TelemetryModel {
     @Id
     private Long timestamp;
-    private String key1;
-    private Double value1;
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id", nullable = false)
     private DeviceModel device;
+    private String key1;
+    private Double value1;
+
 
     public TelemetryModel(String key1, Double value1, DeviceModel device) {
         this.timestamp = System.currentTimeMillis();
