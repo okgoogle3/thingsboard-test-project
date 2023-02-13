@@ -26,6 +26,10 @@ public class AssetService {
         return assets.stream().filter(AssetModel::getIsActive).toList();
     }
 
+    public AssetModel getAssetByName(String name){
+        return assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found"));
+    }
+
     public void deleteAssetByName(String name){
         AssetModel asset = assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found"));
         List<DeviceModel> devices = asset.getDevice();
