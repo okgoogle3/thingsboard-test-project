@@ -1,7 +1,8 @@
 package com.example.MyProject.controller;
 
-import com.example.MyProject.controller.DTO.AssetDTO;
+import com.example.MyProject.controller.DTO.Request.AssetDTO;
 import com.example.MyProject.model.AssetModel;
+import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.service.AssetService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.EntityNotFoundException;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -39,10 +39,22 @@ public class AssetController {
         }
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<ObjectNode> test() throws IOException {
-        return ResponseEntity.ok(assetService.testMethod());
+    @GetMapping("/{name}/devices")
+    public ResponseEntity<List<DeviceModel>> getDevicesByAsset(@PathVariable String name) {
+        try{
+            return ResponseEntity.ok(assetService.getDevicesByAsset(name));
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
 
+    @GetMapping("/{name}/devices/active")
+    public ResponseEntity<List<DeviceModel>> getActiveDevicesByAsset(@PathVariable String name) {
+        try{
+            return ResponseEntity.ok(assetService.getActiveDevicesByAsset(name));
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping

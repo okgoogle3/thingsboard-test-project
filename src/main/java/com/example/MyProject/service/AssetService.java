@@ -1,6 +1,6 @@
 package com.example.MyProject.service;
 
-import com.example.MyProject.controller.DTO.AssetDTO;
+import com.example.MyProject.controller.DTO.Request.AssetDTO;
 import com.example.MyProject.model.AssetModel;
 import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.repo.AssetRepo;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -71,5 +72,15 @@ public class AssetService {
         AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
         asset.setPerimeter(perimeter.toString());
         assetRepo.save(asset);
+    }
+
+    public List<DeviceModel> getDevicesByAsset(String name){
+        AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
+        return asset.getDevice();
+    }
+
+    public List<DeviceModel> getActiveDevicesByAsset(String name){
+        AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
+        return asset.getDevice().stream().filter(DeviceModel::getIsActive).collect(Collectors.toList());
     }
 }

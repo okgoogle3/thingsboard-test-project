@@ -1,4 +1,4 @@
-package com.example.MyProject.controller.DTO;
+package com.example.MyProject.controller.DTO.Request;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;

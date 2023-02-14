@@ -5,6 +5,7 @@ import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.repo.AssetRepo;
 import com.example.MyProject.repo.DeviceRepo;
 import com.example.MyProject.service.DeviceService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,17 +32,13 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.getAllActiveDevices());
     }
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<Void> createDeviceWithAsset() {
-        Optional<AssetModel> optionalAsset = assetRepo.findByName("aboba");
-        AssetModel asset;
-        if(optionalAsset.isPresent()) {
-            asset = optionalAsset.get();
-            DeviceModel device = new DeviceModel("aboba", true, 30.0, 30.0);
-            deviceRepo.save(device);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.badRequest().build();
+        AssetModel asset = assetRepo.findByName("aboba").orElseThrow(() -> new EntityNotFoundException("Asset not found"));
+
+        DeviceModel device = new DeviceModel("aboba", true, 30.0, 30.0, asset);
+        deviceRepo.save(device);
+        return ResponseEntity.ok().build();
     }
 
 
