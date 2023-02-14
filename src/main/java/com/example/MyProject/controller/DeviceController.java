@@ -80,22 +80,28 @@ public class DeviceController {
         }
     }
 
-
-    /*@PutMapping
-    public ResponseEntity<Void> createDeviceWithAsset() {
-        AssetModel asset = assetRepo.findByName("aboba").orElseThrow(() -> new EntityNotFoundException("Asset not found"));
-
-        DeviceModel device = new DeviceModel("aboba2", true, 1.5, 1.5, asset);
-        deviceRepo.save(device);
-        return ResponseEntity.ok().build();
+    @GetMapping("/{name}/check")
+    public ResponseEntity<Boolean> checkIfDeviceInAssetPerimeter(@PathVariable String name) {
+        try {
+            AssetModel asset = assetRepo.findByName("aboba").orElseThrow(() -> new EntityNotFoundException("Asset not found"));
+            DeviceModel device = deviceRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
+            String perimeter = asset.getPerimeter();
+            return ResponseEntity.ok(deviceService.checkIfDeviceInAssetPerimeter(perimeter, device.getLatitude(), device.getLongitude()));
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }catch (IOException e){
+            return ResponseEntity.badRequest().build();
+        }
     }
-*/
-    @PostMapping("/{name}/check")
-    public ResponseEntity<Boolean> checkTest(@PathVariable String name) throws IOException {
-        AssetModel asset = assetRepo.findByName("aboba").orElseThrow(() -> new EntityNotFoundException("Asset not found"));
-        DeviceModel device = deviceRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
-        String perimeter = asset.getPerimeter();
-        return ResponseEntity.ok(deviceService.check(perimeter, device.getLatitude(), device.getLongitude()));
+
+    @PostMapping("/{name}/remove_relation")
+    public ResponseEntity<Void> removeRelationOnDevice(@PathVariable String name) {
+        try {
+            deviceService.removeRelationOnDevice(name);
+            return ResponseEntity.ok().build();
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping

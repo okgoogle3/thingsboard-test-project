@@ -56,28 +56,26 @@ public class DeviceService {
         deviceRepo.save(device);
     }
 
+    public void removeRelationOnDevice(String deviceName){
+        DeviceModel device = deviceRepo.findByName(deviceName).orElseThrow(() -> new EntityNotFoundException("Device not found"));
+        device.setRelatedAsset(null);
+        deviceRepo.save(device);
+    }
+
     public void deleteDeviceByName(String name){
         DeviceModel device = deviceRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Device not found"));
         device.setRelatedAsset(null);
         deviceRepo.save(device);
-        /*AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
-        List<DeviceModel> devices = asset.getDevice();
-        devices.forEach(deviceModel -> deviceModel.setRelatedAsset(null));
-        asset.setDevice(new ArrayList<>());
-        deviceRepo.saveAll(devices);
-        assetRepo.save(asset);
-        assetRepo.delete(asset);*/
     }
 
     public void deleteDevices(){
-
         List<DeviceModel> devices = deviceRepo.findAll();
         devices.forEach(deviceModel -> deviceModel.setRelatedAsset(null));
         deviceRepo.saveAll(devices);
         deviceRepo.deleteAll();
     }
 
-    public boolean check (String stringPerimeter, double x, double y) throws IOException {
+    public boolean checkIfDeviceInAssetPerimeter (String stringPerimeter, double x, double y) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonFactory factory = mapper.getFactory();
         JsonParser parser = factory.createParser(stringPerimeter);
@@ -85,28 +83,28 @@ public class DeviceService {
 
         double xA = perimeter.get("xA").doubleValue();
         double yA = perimeter.get("yA").doubleValue();
-        double xB = perimeter.get("xA").doubleValue();
-        double yB = perimeter.get("yA").doubleValue();
-        double xC = perimeter.get("xA").doubleValue();
-        double yC = perimeter.get("yA").doubleValue();
-        double xD = perimeter.get("xA").doubleValue();
-        double yD = perimeter.get("yA").doubleValue();
-        return checkPoint(xA, yA, xB, yB, x, y) && checkPoint(xB, yB, xC, yC, x, y)
-                && checkPoint(xC, yC, xD, yD, x, y) && checkPoint(xD, yD, xA, yA, x, y);
-    }
-    private boolean checkPoint(double xA, double yA, double xB, double yB,double x, double y) {
-        double ax = xA - x;
-        double ay = yA - y;
-        double bx = xB - x;
-        double by = yB - y;
-        boolean s = (ax * by - ay * bx) > 0;
-        if (ay < 0 ^ by < 0)
-        {
-            if (by < 0)
-                return s;
-            return !s;
-        }
-        return true;
-    }
+        double xB = perimeter.get("xB").doubleValue();
+        double yB = perimeter.get("yB").doubleValue();
+        double xC = perimeter.get("xC").doubleValue();
+        double yC = perimeter.get("yC").doubleValue();
+        double xD = perimeter.get("xD").doubleValue();
+        double yD = perimeter.get("yD").doubleValue();
 
+        if (checkMaxMin(x, xA, xB, xC, xD) || checkMaxMin(y, yA, yB, yC, yD)) return false;
+
+        double cross1 = (x - xA) * (yB - yA) - (y - yA) * (xB - xA);
+        double cross2 = (x - xB) * (yC - yB) - (y - yB) * (xC - xB);
+        double cross3 = (x - xC) * (yD - yC) - (y - yC) * (xD - xC);
+        double cross4 = (x - xD) * (yA - yD) - (y - yD) * (xA - xD);
+
+        return cross1 >= 0 && cross2 >= 0 && cross3 >= 0 && cross4 >= 0;
+    }
+    private boolean checkMaxMin(double point, double rect1, double rect2, double rect3, double rect4) {
+        double min = Math.min(Math.min(rect1, rect2), Math.min(rect3, rect4));
+        if (point < min) {
+            return true;
+        }
+        double max = Math.max(Math.max(rect1, rect2), Math.max(rect3, rect4));
+        return point > max;
+    }
 }
