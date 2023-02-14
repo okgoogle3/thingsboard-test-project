@@ -41,7 +41,6 @@ public class DeviceController {
         return ResponseEntity.ok().build();
     }
 
-
     /*@GetMapping("/{id}")
     public ResponseEntity<List<DeviceModel>> getTelemetryOfDevice(@PathVariable String id) {
 
