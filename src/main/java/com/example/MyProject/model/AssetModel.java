@@ -22,7 +22,7 @@ import java.util.UUID;
 public class AssetModel {
     @Id
     private String id;
-    @Column(name="name", unique=true)
+    @Column(unique=true)
     private String name;
     private Boolean isActive;
     private String perimeter;

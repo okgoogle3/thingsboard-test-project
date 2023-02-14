@@ -1,25 +1,19 @@
 package com.example.MyProject.controller;
 
-import com.example.MyProject.controller.DTO.Request.AssetDTO;
 import com.example.MyProject.controller.DTO.Request.DeviceDTO;
 import com.example.MyProject.model.AssetModel;
 import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.repo.AssetRepo;
 import com.example.MyProject.repo.DeviceRepo;
 import com.example.MyProject.service.DeviceService;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)
@@ -80,7 +74,7 @@ public class DeviceController {
         }
     }
 
-    @GetMapping("/{name}/check")
+    /*@GetMapping("/{name}/check")
     public ResponseEntity<Boolean> checkIfDeviceInAssetPerimeter(@PathVariable String name) {
         try {
             AssetModel asset = assetRepo.findByName("aboba").orElseThrow(() -> new EntityNotFoundException("Asset not found"));
@@ -92,7 +86,7 @@ public class DeviceController {
         }catch (IOException e){
             return ResponseEntity.badRequest().build();
         }
-    }
+    }*/
 
     @PostMapping("/{name}/remove_relation")
     public ResponseEntity<Void> removeRelationOnDevice(@PathVariable String name) {
@@ -113,21 +107,4 @@ public class DeviceController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
-    /*@GetMapping("/{id}")
-    public ResponseEntity<List<DeviceModel>> getTelemetryOfDevice(@PathVariable String id) {
-
-    }
-
-    @GetMapping("/{id}/telemetry")
-    public ResponseEntity<List<TelemetryModel>> getTelemetryOfDevice(@PathVariable String id) {
-        return ResponseEntity.ok(deviceRepo.findAll());
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> createArticle() {
-
-    }*/
-
 }

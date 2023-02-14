@@ -1,22 +1,17 @@
 package com.example.MyProject.model.CompositeKey;
 
 import com.example.MyProject.model.DeviceModel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@NoArgsConstructor
+@AllArgsConstructor
 public class TelemetryId implements Serializable {
     private Long timestamp;
     private DeviceModel device;
-
-    public TelemetryId(){
-
-    }
-
-    public TelemetryId(Long timestamp, DeviceModel deviceModel){
-        this.timestamp = timestamp;
-        this.device = deviceModel;
-    }
 
     @Override
     public boolean equals(Object o) {
