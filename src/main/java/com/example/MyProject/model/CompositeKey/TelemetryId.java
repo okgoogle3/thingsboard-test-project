@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class TelemetryId implements Serializable {
     private Long timestamp;
-    private DeviceModel deviceModel;
+    private DeviceModel device;
 
     public TelemetryId(){
 
@@ -15,7 +15,7 @@ public class TelemetryId implements Serializable {
 
     public TelemetryId(Long timestamp, DeviceModel deviceModel){
         this.timestamp = timestamp;
-        this.deviceModel = deviceModel;
+        this.device = deviceModel;
     }
 
     @Override
@@ -23,11 +23,11 @@ public class TelemetryId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TelemetryId that = (TelemetryId) o;
-        return Objects.equals(timestamp, that.timestamp) && Objects.equals(deviceModel, that.deviceModel);
+        return Objects.equals(timestamp, that.timestamp) && Objects.equals(device, that.device);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(timestamp, deviceModel);
+        return Objects.hash(timestamp, device);
     }
 }

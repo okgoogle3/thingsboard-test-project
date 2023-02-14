@@ -5,10 +5,15 @@ import com.example.MyProject.model.AssetModel;
 import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.repo.AssetRepo;
 import com.example.MyProject.repo.DeviceRepo;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -27,11 +32,11 @@ public class AssetService {
     }
 
     public AssetModel getAssetByName(String name){
-        return assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found"));
+        return assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
     }
 
     public void deleteAssetByName(String name){
-        AssetModel asset = assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found"));
+        AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
         List<DeviceModel> devices = asset.getDevice();
         devices.forEach(deviceModel -> deviceModel.setRelatedAsset(null));
         asset.setDevice(new ArrayList<>());
@@ -41,19 +46,30 @@ public class AssetService {
     }
 
     public void changeActivityState(String name){
-        AssetModel asset = assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found"));
+        AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
         asset.setIsActive(!asset.getIsActive());
         assetRepo.save(asset);
     }
 
-    public String createAsset(AssetDTO requestedAsset){
-        AssetModel asset = new AssetModel(requestedAsset.getName(), requestedAsset.getPerimeter());
+    public String createAsset(AssetDTO requestedAsset) {
+        String perimeter = requestedAsset.getPerimeter().toString();
+        AssetModel asset = new AssetModel(requestedAsset.getName(), perimeter);
         assetRepo.save(asset);
         return asset.getName();
     }
 
-    /*public void deleteAssetByName(String name){
-        assetRepo.delete(assetRepo.findByName(name).orElseThrow(()-> new EntityNotFoundException("Asset not found")));
-    }*/
+    public ObjectNode testMethod() throws IOException {
+        String jsonString = assetRepo.findByName("aboba").orElseThrow(() -> new EntityNotFoundException("Asset not found")).getPerimeter();
 
+        ObjectMapper mapper = new ObjectMapper();
+        JsonFactory factory = mapper.getFactory();
+        JsonParser parser = factory.createParser(jsonString);
+        return mapper.readTree(parser);
+    }
+
+    public void setPerimeter(String name, ObjectNode perimeter){
+        AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
+        asset.setPerimeter(perimeter.toString());
+        assetRepo.save(asset);
+    }
 }

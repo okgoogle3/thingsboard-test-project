@@ -2,6 +2,7 @@ package com.example.MyProject.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +24,6 @@ public class AssetModel {
     private String id;
     private String name;
     private Boolean isActive;
-
     private String perimeter;
     @JsonManagedReference(value = "asset-device-relation")
     @OneToMany(mappedBy = "relatedAsset", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
