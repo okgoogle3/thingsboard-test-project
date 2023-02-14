@@ -68,6 +68,11 @@ public class AssetService {
         return mapper.readTree(parser);
     }
 
+    /**
+     * B-----C
+     * |     |
+     * A-----D
+     */
     public void setPerimeter(String name, ObjectNode perimeter){
         AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
         asset.setPerimeter(perimeter.toString());

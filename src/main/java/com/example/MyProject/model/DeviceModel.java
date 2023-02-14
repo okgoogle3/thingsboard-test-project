@@ -18,6 +18,7 @@ import java.util.UUID;
 public class DeviceModel {
     @Id
     private String id;
+    @Column(name="name", unique=true)
     private String name;
     private Boolean isActive;
     private Double latitude;
@@ -32,19 +33,19 @@ public class DeviceModel {
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Set<TelemetryModel> telemetry;
 
-    public DeviceModel(String name, Boolean isActive, Double x, Double y, AssetModel asset){
+    public DeviceModel(String name, Double x, Double y, AssetModel asset){
         this.id = UUID.randomUUID().toString();
         this.name = name;
-        this.isActive = isActive;
+        this.isActive = false;
         this.latitude = x;
         this.longitude = y;
         this.relatedAsset = asset;
     }
 
-    public DeviceModel(String name, Boolean isActive, Double x, Double y){
+    public DeviceModel(String name, Double x, Double y){
         this.id = UUID.randomUUID().toString();
         this.name = name;
-        this.isActive = isActive;
+        this.isActive = false;
         this.latitude = x;
         this.longitude = y;
     }
