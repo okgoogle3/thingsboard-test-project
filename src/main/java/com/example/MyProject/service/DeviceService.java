@@ -10,6 +10,9 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,7 +29,7 @@ public class DeviceService {
 
     public final DeviceRepo deviceRepo;
     public final AssetRepo assetRepo;
-    public final ApplicationEventPublisher eventPublisher;
+    TelegramBot bot = new TelegramBot("1964718902:AAGr-1C3k8p0bboOGhvz80AUsHYjEE6ESGE");
 
     public List<DeviceModel> getAllDevices(){
         return deviceRepo.findAll();
@@ -51,10 +54,11 @@ public class DeviceService {
         return device.getName();
     }
 
-    public void relateDeviceToAsset(String deviceName, String assetName){
+    public void relateDeviceToAsset(String deviceName, String assetName) throws IOException {
         DeviceModel device = deviceRepo.findByName(deviceName).orElseThrow(() -> new EntityNotFoundException("Device not found"));
         AssetModel asset = assetRepo.findByName(assetName).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
         device.setRelatedAsset(asset);
+        device.setIsInAssetPerimeter(checkIfDeviceInAssetPerimeter(asset.getPerimeter(), device.getLatitude(), device.getLongitude()));
         deviceRepo.save(device);
     }
 
@@ -84,11 +88,13 @@ public class DeviceService {
         if(device.getRelatedAsset() != null){
             boolean isDeviceInPerimeter = checkIfDeviceInAssetPerimeter(device.getRelatedAsset().getPerimeter(), latitude, longitude);
             if (!isDeviceInPerimeter && device.getIsInAssetPerimeter()) {
-                eventPublisher.publishEvent(name + " leaving " + device.getRelatedAsset().getName() + "'s perimeter");
-                deviceRepo.save(device);
+                bot.execute(new SendMessage(370701421, "У тебя девайс съебался, бро"));
+                // 364387990 me
+                // 370701421 Artem
             }
-            else deviceRepo.save(device);
+            device.setIsInAssetPerimeter(isDeviceInPerimeter);
         }
+        deviceRepo.save(device);
     }
 
     public boolean checkIfDeviceInAssetPerimeter (String stringPerimeter, double x, double y) throws IOException {
@@ -97,14 +103,14 @@ public class DeviceService {
         JsonParser parser = factory.createParser(stringPerimeter);
         ObjectNode perimeter = mapper.readTree(parser);
 
-        double xA = perimeter.get("xA").doubleValue();
-        double yA = perimeter.get("yA").doubleValue();
-        double xB = perimeter.get("xB").doubleValue();
-        double yB = perimeter.get("yB").doubleValue();
-        double xC = perimeter.get("xC").doubleValue();
-        double yC = perimeter.get("yC").doubleValue();
-        double xD = perimeter.get("xD").doubleValue();
-        double yD = perimeter.get("yD").doubleValue();
+        double xA = perimeter.get("xA").asDouble();
+        double yA = perimeter.get("yA").asDouble();
+        double xB = perimeter.get("xB").asDouble();
+        double yB = perimeter.get("yB").asDouble();
+        double xC = perimeter.get("xC").asDouble();
+        double yC = perimeter.get("yC").asDouble();
+        double xD = perimeter.get("xD").asDouble();
+        double yD = perimeter.get("yD").asDouble();
 
         if (checkMaxMin(x, xA, xB, xC, xD) || checkMaxMin(y, yA, yB, yC, yD)) return false;
 
