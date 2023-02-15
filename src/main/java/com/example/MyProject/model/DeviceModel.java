@@ -21,6 +21,7 @@ public class DeviceModel {
     @Column(name="name", unique=true)
     private String name;
     private Boolean isActive;
+    private Boolean isInAssetPerimeter;
     private Double latitude;
     private Double longitude;
 
@@ -37,6 +38,7 @@ public class DeviceModel {
         this.id = UUID.randomUUID().toString();
         this.name = name;
         this.isActive = false;
+        this.isInAssetPerimeter = false;
         this.latitude = x;
         this.longitude = y;
     }

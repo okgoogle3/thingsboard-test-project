@@ -20,14 +20,15 @@ public class TelemetryModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id", nullable = false)
     private DeviceModel device;
-    private String key1;
-    private Double value1;
+    @Id
+    private String type;
+    private Double value;
 
 
-    public TelemetryModel(String key1, Double value1, DeviceModel device) {
+    public TelemetryModel(String type, Double value, DeviceModel device) {
         this.timestamp = System.currentTimeMillis();
-        this.key1 = key1;
-        this.value1 = value1;
+        this.type = type;
+        this.value = value;
         this.device = device;
     }
 }

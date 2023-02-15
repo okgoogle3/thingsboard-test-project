@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class DeviceService {
 
     public final DeviceRepo deviceRepo;
     public final AssetRepo assetRepo;
+    public final ApplicationEventPublisher eventPublisher;
 
     public List<DeviceModel> getAllDevices(){
         return deviceRepo.findAll();
@@ -73,6 +75,20 @@ public class DeviceService {
         devices.forEach(deviceModel -> deviceModel.setRelatedAsset(null));
         deviceRepo.saveAll(devices);
         deviceRepo.deleteAll();
+    }
+
+    public void relocate(String name, double latitude, double longitude) throws IOException {
+        DeviceModel device = deviceRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Device not found"));
+        device.setLatitude(latitude);
+        device.setLongitude(longitude);
+        if(device.getRelatedAsset() != null){
+            boolean isDeviceInPerimeter = checkIfDeviceInAssetPerimeter(device.getRelatedAsset().getPerimeter(), latitude, longitude);
+            if (!isDeviceInPerimeter && device.getIsInAssetPerimeter()) {
+                eventPublisher.publishEvent(name + " leaving " + device.getRelatedAsset().getName() + "'s perimeter");
+                deviceRepo.save(device);
+            }
+            else deviceRepo.save(device);
+        }
     }
 
     public boolean checkIfDeviceInAssetPerimeter (String stringPerimeter, double x, double y) throws IOException {

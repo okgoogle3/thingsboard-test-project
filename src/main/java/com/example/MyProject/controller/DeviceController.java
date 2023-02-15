@@ -1,7 +1,8 @@
 package com.example.MyProject.controller;
 
+import com.example.MyProject.controller.DTO.Request.DeviceCoordinatesDTO;
 import com.example.MyProject.controller.DTO.Request.DeviceDTO;
-import com.example.MyProject.model.AssetModel;
+import com.example.MyProject.controller.DTO.Request.NameDTO;
 import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.repo.AssetRepo;
 import com.example.MyProject.repo.DeviceRepo;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -65,28 +67,27 @@ public class DeviceController {
     }
 
     @PostMapping("/{name}/relate")
-    public ResponseEntity<Void> relateDeviceToAsset (@PathVariable String name, @RequestBody ObjectNode assetNameNode){
+    public ResponseEntity<Void> relateDeviceToAsset (@PathVariable String name, @RequestBody NameDTO assetName){
         try {
-            deviceService.relateDeviceToAsset(name, assetNameNode.get("name").asText());
+            deviceService.relateDeviceToAsset(name, assetName.getName());
             return ResponseEntity.ok().build();
         }catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
         }
     }
 
-    /*@GetMapping("/{name}/check")
+    @GetMapping("/{name}/check")
     public ResponseEntity<Boolean> checkIfDeviceInAssetPerimeter(@PathVariable String name) {
         try {
-            AssetModel asset = assetRepo.findByName("aboba").orElseThrow(() -> new EntityNotFoundException("Asset not found"));
             DeviceModel device = deviceRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
-            String perimeter = asset.getPerimeter();
+            String perimeter = device.getRelatedAsset().getPerimeter();
             return ResponseEntity.ok(deviceService.checkIfDeviceInAssetPerimeter(perimeter, device.getLatitude(), device.getLongitude()));
         }catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
         }catch (IOException e){
             return ResponseEntity.badRequest().build();
         }
-    }*/
+    }
 
     @PostMapping("/{name}/remove_relation")
     public ResponseEntity<Void> removeRelationOnDevice(@PathVariable String name) {
@@ -95,6 +96,18 @@ public class DeviceController {
             return ResponseEntity.ok().build();
         }catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{name}/relocate")
+    public ResponseEntity<Void> relocateDevice(@PathVariable String name, @RequestBody DeviceCoordinatesDTO coordinates) {
+        try {
+            deviceService.relocate(name, coordinates.getLatitude(),coordinates.getLongitude());
+            return ResponseEntity.ok().build();
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
