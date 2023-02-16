@@ -62,6 +62,7 @@ public class AspectBot {
 
     @After("callAtMyServicePublic()")
     public void afterCallAt() {
-        chat_id.parallelStream().forEach(id -> bot.execute(new SendMessage(id, "Aspect is working rn")));
+        //chat_id.parallelStream().forEach(id -> bot.execute(new SendMessage(id, "Aspect is working rn"))); //for future improvements
+        chat_id.forEach(id -> bot.execute(new SendMessage(id, "Aspect is working rn")));
     }
 }

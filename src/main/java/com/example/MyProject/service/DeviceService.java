@@ -88,7 +88,7 @@ public class DeviceService {
         if(device.getRelatedAsset() != null){
             boolean isDeviceInPerimeter = checkIfDeviceInAssetPerimeter(device.getRelatedAsset().getPerimeter(), latitude, longitude);
             if (!isDeviceInPerimeter && device.getIsInAssetPerimeter()) {
-                bot.execute(new SendMessage(390653777, "У тебя девайс съебался, бро"));
+                bot.execute(new SendMessage(364387990, "У тебя девайс съебался, бро"));
                 // 364387990 me
                 // 370701421 Artem
                 //390653777 Настя

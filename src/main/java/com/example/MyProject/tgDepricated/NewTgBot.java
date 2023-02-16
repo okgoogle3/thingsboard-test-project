@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class NewTgBot {
     public static void main(String[] args) {
-        TelegramBot bot = new TelegramBot("1964718902:AAGr-1C3k8p0bboOGhvz80AUsHYjEE6ESGE");
+        TelegramBot bot = new TelegramBot("");
         GetUpdates getUpdates = new GetUpdates().limit(100).offset(0).timeout(0);
         GetUpdatesResponse updatesResponse = bot.execute(getUpdates);
         //List<Update> updates = updatesResponse.updates().stream().filter(update -> update.message().text().equals("/start")).toList();
