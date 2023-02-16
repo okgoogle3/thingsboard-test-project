@@ -1,4 +1,4 @@
-package com.example.MyProject;
+package com.example.MyProject.tgDepricated;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
