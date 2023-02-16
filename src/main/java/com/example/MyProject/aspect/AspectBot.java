@@ -7,6 +7,8 @@ import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +21,11 @@ import java.util.Set;
 
 @Aspect
 @Component
+@Getter
+@Setter
 public class AspectBot {
-    TelegramBot bot = new TelegramBot("6116276576:AAEurzwvN0eUyps8aGomnw8Xwn6Tqwp78Sk");
-    Set<Long> chat_id = new HashSet<>();
+    public static TelegramBot bot = new TelegramBot("6116276576:AAEurzwvN0eUyps8aGomnw8Xwn6Tqwp78Sk");
+    public static Set<Long> chat_id = new HashSet<>();
 
     @PostConstruct
     public void initialization() {
@@ -57,7 +61,7 @@ public class AspectBot {
         });
     }
 
-    @Pointcut("execution(public * com.example.MyProject.service.DeviceService.*(..)) || execution(public * com.example.MyProject.service.AssetService.*(..))")
+    @Pointcut("execution(public * com.example.MyProject.controller.DeviceController.*(..)) || execution(public * com.example.MyProject.controller.AssetController.*(..))")
     public void callAtMyServicePublic() { }
 
     @After("callAtMyServicePublic()")

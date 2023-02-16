@@ -1,6 +1,6 @@
 package com.example.MyProject.service;
 
-import com.example.MyProject.controller.DTO.Request.AssetDTO;
+import com.example.MyProject.aspect.AspectBot;
 import com.example.MyProject.controller.DTO.Request.DeviceDTO;
 import com.example.MyProject.model.AssetModel;
 import com.example.MyProject.model.DeviceModel;
@@ -12,16 +12,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -29,7 +26,8 @@ public class DeviceService {
 
     public final DeviceRepo deviceRepo;
     public final AssetRepo assetRepo;
-    TelegramBot bot = new TelegramBot("1964718902:AAGr-1C3k8p0bboOGhvz80AUsHYjEE6ESGE");
+    public final TelegramBot bot = AspectBot.bot;
+    private final Set<Long> id = AspectBot.chat_id;
 
     public List<DeviceModel> getAllDevices(){
         return deviceRepo.findAll();
@@ -88,7 +86,7 @@ public class DeviceService {
         if(device.getRelatedAsset() != null){
             boolean isDeviceInPerimeter = checkIfDeviceInAssetPerimeter(device.getRelatedAsset().getPerimeter(), latitude, longitude);
             if (!isDeviceInPerimeter && device.getIsInAssetPerimeter()) {
-                bot.execute(new SendMessage(364387990, "У тебя девайс съебался, бро"));
+                id.forEach(id -> bot.execute(new SendMessage(id, "Device " + device.getName() + " leaving perimeter")));
                 // 364387990 me
                 // 370701421 Artem
                 //390653777 Настя
