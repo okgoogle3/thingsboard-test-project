@@ -9,14 +9,12 @@ import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Aspect
@@ -24,6 +22,8 @@ import java.util.Set;
 @Getter
 @Setter
 public class AspectBot {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     public static TelegramBot bot = new TelegramBot("6116276576:AAEurzwvN0eUyps8aGomnw8Xwn6Tqwp78Sk");
     public static Set<Long> chat_id = new HashSet<>();
 
@@ -35,10 +35,11 @@ public class AspectBot {
         List<Update> updates = updatesResponse.updates();*/
 
         bot.setUpdatesListener(updates -> {
-            updates.removeIf(element -> element.message() == null);
+            updates.removeIf(element -> element.message() == null || element.message().text() == null);
             Long id;
             for (Update update : updates) {
                 id = update.message().chat().id();
+                logger.info("New message from "+ update.message().chat().username());
                 if(update.message().text().equals("/subscribe")) {
                     if (chat_id.contains(id)) bot.execute(new SendMessage(id, "You are a subscriber."));
                     else {
@@ -67,6 +68,6 @@ public class AspectBot {
     @After("callAtMyServicePublic()")
     public void afterCallAt() {
         //chat_id.parallelStream().forEach(id -> bot.execute(new SendMessage(id, "Aspect is working rn"))); //for future improvements
-        chat_id.forEach(id -> bot.execute(new SendMessage(id, "Aspect is working rn")));
+        //chat_id.forEach(id -> bot.execute(new SendMessage(id, "Aspect is working rn")));
     }
 }

@@ -27,7 +27,6 @@ public class DeviceService {
     public final DeviceRepo deviceRepo;
     public final AssetRepo assetRepo;
     public final TelegramBot bot = AspectBot.bot;
-    private final Set<Long> id = AspectBot.chat_id;
 
     public List<DeviceModel> getAllDevices(){
         return deviceRepo.findAll();
@@ -86,7 +85,7 @@ public class DeviceService {
         if(device.getRelatedAsset() != null){
             boolean isDeviceInPerimeter = checkIfDeviceInAssetPerimeter(device.getRelatedAsset().getPerimeter(), latitude, longitude);
             if (!isDeviceInPerimeter && device.getIsInAssetPerimeter()) {
-                id.forEach(id -> bot.execute(new SendMessage(id, "Device " + device.getName() + " leaving perimeter")));
+                AspectBot.chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device " + device.getName() + " leaving perimeter")));
                 // 364387990 me
                 // 370701421 Artem
                 //390653777 Настя
