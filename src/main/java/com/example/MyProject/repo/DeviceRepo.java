@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface DeviceRepo extends JpaRepository<DeviceModel, Long> {
-    Optional<DeviceModel> findById(String id);
     Optional<DeviceModel> findByName(String name);
 }

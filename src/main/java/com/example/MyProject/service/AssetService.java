@@ -52,6 +52,13 @@ public class AssetService {
         assetRepo.save(asset);
     }
 
+    public void changeTemperatureThreshold(String name, Double temperature){
+        AssetModel asset = assetRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Asset not found"));
+        List<DeviceModel> devices = asset.getDevice();
+        devices.forEach(device -> device.setTemperatureThreshold(temperature));
+        assetRepo.save(asset);
+    }
+
     public String createAsset(AssetDTO requestedAsset) {
         String perimeter = requestedAsset.getPerimeter().toString();
         AssetModel asset = new AssetModel(requestedAsset.getName(), perimeter);

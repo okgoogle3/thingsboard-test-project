@@ -9,7 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface AssetRepo extends JpaRepository<AssetModel, Long> {
-    Optional<AssetModel> findById(String id);
     Optional<AssetModel> findByName(String name);
-    void deleteByName(String name);
 }

@@ -1,6 +1,7 @@
 package com.example.MyProject.controller;
 
 import com.example.MyProject.controller.DTO.Request.AssetDTO;
+import com.example.MyProject.controller.DTO.Request.TemperatureDTO;
 import com.example.MyProject.model.AssetModel;
 import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.service.AssetService;
@@ -91,6 +92,16 @@ public class AssetController {
     public ResponseEntity<Void> deleteAsset(@PathVariable String name){
         try {
             assetService.deleteAssetByName(name);
+            return ResponseEntity.ok().build();
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{name}/temperature_threshold")
+    public ResponseEntity<Void> changeTemperatureThreshold(@PathVariable String name, @RequestBody TemperatureDTO temperatureThreshold){
+        try {
+            assetService.changeTemperatureThreshold(name, temperatureThreshold.getTemperature());
             return ResponseEntity.ok().build();
         }catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();

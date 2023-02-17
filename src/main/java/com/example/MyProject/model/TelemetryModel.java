@@ -1,6 +1,7 @@
 package com.example.MyProject.model;
 
 import com.example.MyProject.model.CompositeKey.TelemetryId;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class TelemetryModel {
     @Id
     private Long timestamp;
     @Id
+    @JsonBackReference(value = "device-telemetry-relation")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id", nullable = false)
     private DeviceModel device;
@@ -25,7 +27,7 @@ public class TelemetryModel {
     private Double value;
 
 
-    public TelemetryModel(String type, Double value, DeviceModel device) {
+    public TelemetryModel(DeviceModel device, String type, Double value) {
         this.timestamp = System.currentTimeMillis();
         this.type = type;
         this.value = value;

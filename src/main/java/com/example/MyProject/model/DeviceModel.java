@@ -1,6 +1,7 @@
 package com.example.MyProject.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,7 @@ public class DeviceModel {
     private Boolean isActive;
     private Boolean isInAssetPerimeter;
     private Double latitude;
+    private Double temperatureThreshold;
     private Double longitude;
 
     @Nullable
@@ -31,6 +33,7 @@ public class DeviceModel {
     @JoinColumn(name = "asset_id", referencedColumnName = "id")
     private AssetModel relatedAsset;
 
+    @JsonManagedReference(value = "device-telemetry-relation")
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Set<TelemetryModel> telemetry;
 
