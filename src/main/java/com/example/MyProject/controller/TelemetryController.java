@@ -4,6 +4,8 @@ import com.example.MyProject.controller.DTO.Request.TelemetryAggregationDTO;
 import com.example.MyProject.controller.DTO.Request.TelemetryHexDTO;
 import com.example.MyProject.model.TelemetryModel;
 import com.example.MyProject.service.TelemetryService;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +20,8 @@ public class TelemetryController {
     public final TelemetryService telemetryService;
 
     @GetMapping("/device")
-    public ResponseEntity<List<TelemetryModel>> getAggregatedTelemetryByDevice(@RequestBody TelemetryAggregationDTO tm){
-        List<TelemetryModel> telemetry = telemetryService
+    public ResponseEntity<List<ObjectNode>> getAggregatedTelemetryByDevice(@RequestBody TelemetryAggregationDTO tm){
+        List<ObjectNode> telemetry = telemetryService
                 .getTelemetryByDevice(tm.getDeviceName(), tm.getType(), tm.getStartTs(),
                         tm.getEndTs(), tm.getAggregationPeriod(), tm.getAggregationFunction());
         return ResponseEntity.ok(telemetry);

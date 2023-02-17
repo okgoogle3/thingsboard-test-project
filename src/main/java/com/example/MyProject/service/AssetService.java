@@ -66,15 +66,6 @@ public class AssetService {
         return asset.getName();
     }
 
-    public ObjectNode testMethod() throws IOException {
-        String jsonString = assetRepo.findByName("aboba").orElseThrow(() -> new EntityNotFoundException("Asset not found")).getPerimeter();
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonFactory factory = mapper.getFactory();
-        JsonParser parser = factory.createParser(jsonString);
-        return mapper.readTree(parser);
-    }
-
     /**
      * B-----C
      * |     |

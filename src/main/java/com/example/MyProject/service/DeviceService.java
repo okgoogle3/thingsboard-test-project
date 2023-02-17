@@ -94,7 +94,6 @@ public class DeviceService {
         }
         deviceRepo.save(device);
     }
-
     public boolean checkIfDeviceInAssetPerimeter (String stringPerimeter, double x, double y) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonFactory factory = mapper.getFactory();
