@@ -1,5 +1,7 @@
 package com.example.MyProject.aspect;
 
+import com.example.MyProject.model.AssetModel;
+import com.example.MyProject.service.AssetService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Aspect
@@ -23,9 +26,11 @@ import java.util.Set;
 @Setter
 public class AspectBot {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    public AssetService assetService;
 
     public static TelegramBot bot = new TelegramBot("6116276576:AAEurzwvN0eUyps8aGomnw8Xwn6Tqwp78Sk");
     public static Set<Long> chat_id = new HashSet<>();
+
 
     @PostConstruct
     public void initialization() {
@@ -54,6 +59,15 @@ public class AspectBot {
                     }
                     else bot.execute(new SendMessage(id, "You are not a subscriber."));
                 }
+                //for future improvements
+                /*if(update.message().text().equals("Set temperature threshold on asset")
+                        && update.message().chat().username().equals("verri_nais")){
+                    bot.execute(new SendMessage(id, "Which asset?"));
+                    StringBuilder assetsNames = new StringBuilder();
+                    List<AssetModel> assets = assetService.getAllAssets();
+                    assets.forEach(asset -> assetsNames.append(asset.getName()).append("\n"));
+                    bot.execute(new SendMessage(id, assetsNames.toString()));
+                }*/
             }
             //updates.forEach(update -> chat_id.add(update.message().chat().id()));
             //System.out.println(updates);
