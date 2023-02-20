@@ -112,6 +112,7 @@ public class DeviceService {
 
         return cross1 >= 0 && cross2 >= 0 && cross3 >= 0 && cross4 >= 0;
     }
+
     private boolean checkMaxMin(double point, double rect1, double rect2, double rect3, double rect4) {
         double min = Math.min(Math.min(rect1, rect2), Math.min(rect3, rect4));
         if (point < min) {
