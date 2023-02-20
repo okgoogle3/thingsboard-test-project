@@ -20,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class DeviceService {
-
     public final DeviceRepo deviceRepo;
     public final AssetRepo assetRepo;
     public final TgBot bot;
