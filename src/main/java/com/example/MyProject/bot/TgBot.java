@@ -22,12 +22,9 @@ import java.util.concurrent.Executors;
 @Setter
 public class TgBot {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    public AssetService assetService;
-
     public static TelegramBot bot = new TelegramBot("6116276576:AAEurzwvN0eUyps8aGomnw8Xwn6Tqwp78Sk");
     public Set<Long> chat_id = new HashSet<>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
-
 
     @PostConstruct
     public void initialization() {
