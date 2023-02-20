@@ -1,6 +1,6 @@
 package com.example.MyProject.service;
 
-import com.example.MyProject.aspect.AspectBot;
+import com.example.MyProject.bot.TgBot;
 import com.example.MyProject.controller.DTO.Request.DeviceDTO;
 import com.example.MyProject.model.AssetModel;
 import com.example.MyProject.model.DeviceModel;
@@ -10,15 +10,12 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -26,7 +23,7 @@ public class DeviceService {
 
     public final DeviceRepo deviceRepo;
     public final AssetRepo assetRepo;
-    public final TelegramBot bot = AspectBot.bot;
+    public final TgBot bot;
 
     public List<DeviceModel> getAllDevices(){
         return deviceRepo.findAll();
@@ -84,12 +81,8 @@ public class DeviceService {
         device.setLongitude(longitude);
         if(device.getRelatedAsset() != null){
             boolean isDeviceInPerimeter = checkIfDeviceInAssetPerimeter(device.getRelatedAsset().getPerimeter(), latitude, longitude);
-            if (!isDeviceInPerimeter && device.getIsInAssetPerimeter()) {
-                AspectBot.chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device " + device.getName() + " leaving perimeter")));
-                // 364387990 me
-                // 370701421 Artem
-                //390653777 Настя
-            }
+            if (!isDeviceInPerimeter && device.getIsInAssetPerimeter())
+                bot.sendLeavingPerimeterMessage(device.getName());
             device.setIsInAssetPerimeter(isDeviceInPerimeter);
         }
         deviceRepo.save(device);

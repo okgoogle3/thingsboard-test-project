@@ -98,6 +98,8 @@ public class DeviceController {
             return ResponseEntity.ok().build();
         }catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -108,8 +110,8 @@ public class DeviceController {
             return ResponseEntity.ok().build();
         }catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
     }
 

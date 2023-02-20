@@ -35,7 +35,7 @@ public class DeviceModel {
 
     @JsonManagedReference(value = "device-telemetry-relation")
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    private Set<TelemetryModel> telemetry;
+    private List<TelemetryModel> telemetry;
 
     public DeviceModel(String name, Double x, Double y){
         this.id = UUID.randomUUID().toString();

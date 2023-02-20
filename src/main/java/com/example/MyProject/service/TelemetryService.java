@@ -1,20 +1,15 @@
 package com.example.MyProject.service;
 
-import com.example.MyProject.aspect.AspectBot;
+import com.example.MyProject.bot.TgBot;
 import com.example.MyProject.controller.DTO.AggregationFunction;
 import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.model.TelemetryModel;
 import com.example.MyProject.repo.DeviceRepo;
 import com.example.MyProject.repo.TelemetryRepo;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.DecoderException;
@@ -25,7 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -33,7 +27,13 @@ public class TelemetryService {
     public final TelemetryRepo telemetryRepo;
     private final DeviceRepo deviceRepo;
     private final ObjectMapper mapper = new ObjectMapper();
-    public final TelegramBot bot = AspectBot.bot;
+    public final TgBot bot;
+
+    public List<TelemetryModel> getTelemetryByDevice(String name){
+        DeviceModel device = deviceRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Device not found"));
+        return device.getTelemetry();
+    }
+
     public void createTelemetry(String hex) throws DecoderException, IOException {
         byte[] bytes = Hex.decodeHex(hex.substring(0, 20).toCharArray());
         String deviceName = new String(bytes, StandardCharsets.UTF_8);
@@ -49,15 +49,12 @@ public class TelemetryService {
         keys.forEach(key -> telemetry.add(new TelemetryModel(device, key, node.get(key).asDouble())));
         for(TelemetryModel tm : telemetry) {
             if(tm.getType().equals("temperature")&& tm.getDevice().getTemperatureThreshold()<tm.getValue())
-                AspectBot.chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device "
-                        + tm.getDevice().getName() + " is getting hot!\nCurrent temperature "
-                        + tm.getValue() + " degrees Celsius"
-                )));
+                bot.sendTemperatureMessage(tm.getDevice().getName(), tm.getValue());
         }
         telemetryRepo.saveAll(telemetry);
     }
 
-    public List<ObjectNode> getTelemetryByDevice(
+    public List<ObjectNode> getAggregatedTelemetryByDevice(
             String deviceName,
             String telemetryType,
             Long startTs,
