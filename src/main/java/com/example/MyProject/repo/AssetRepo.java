@@ -1,7 +1,6 @@
 package com.example.MyProject.repo;
 
 import com.example.MyProject.model.AssetModel;
-import com.example.MyProject.model.DeviceModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

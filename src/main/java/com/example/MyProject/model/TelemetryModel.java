@@ -3,7 +3,6 @@ package com.example.MyProject.model;
 import com.example.MyProject.model.CompositeKey.TelemetryId;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
