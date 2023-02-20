@@ -71,7 +71,8 @@ public class TelemetryService {
                 while (startTs<endTs){
                     Double minVal = null;
                     Long finalStartTs = startTs;
-                    List<TelemetryModel> currentTelemetry = telemetry.stream().filter(tm -> tm.getTimestamp() < endTs && tm.getTimestamp() >= finalStartTs && tm.getTimestamp() < finalStartTs + aggregationPeriod).toList();
+                    List<TelemetryModel> currentTelemetry = telemetry.stream().filter
+                            (tm -> tm.getTimestamp() < endTs && tm.getTimestamp() >= finalStartTs && tm.getTimestamp() < finalStartTs + aggregationPeriod).toList();
                     if(new HashSet<>(telemetry).containsAll(currentTelemetry))
                     {
                         if (currentTelemetry.size()==0) {
