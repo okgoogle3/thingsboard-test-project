@@ -7,8 +7,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 @Getter
 @Setter
 public class TgBot {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LogManager.getLogger();
     public static TelegramBot bot = new TelegramBot("6116276576:AAEurzwvN0eUyps8aGomnw8Xwn6Tqwp78Sk");
     public Set<Long> chat_id = new HashSet<>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
