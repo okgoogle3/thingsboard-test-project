@@ -55,7 +55,7 @@ public class TgBot {
     public void sendTemperatureMessage (String deviceName, Double temperature){
         executor.execute(() -> chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device "
                 + deviceName + " is getting hot!\nCurrent temperature "
-                + temperature + " degrees Celsius"))));
+                + String.format("%.4f", temperature)  + " degrees Celsius"))));
     }
 
     public void sendLeavingPerimeterMessage (String deviceName) {

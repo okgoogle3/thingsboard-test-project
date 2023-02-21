@@ -48,7 +48,7 @@ public class TelemetryService {
         List<TelemetryModel> telemetry = new ArrayList<>();
         keys.forEach(key -> telemetry.add(new TelemetryModel(device, key, node.get(key).asDouble())));
         for(TelemetryModel tm : telemetry) {
-            if(tm.getType().equals("temperature")&& tm.getDevice().getTemperatureThreshold()<tm.getValue())
+            if(tm.getType().equals("temperature") && tm.getDevice().getTemperatureThreshold()<tm.getValue())
                 bot.sendTemperatureMessage(tm.getDevice().getName(), tm.getValue());
         }
         telemetryRepo.saveAll(telemetry);
