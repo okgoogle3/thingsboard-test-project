@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +56,7 @@ public class TgBot {
     public void sendTemperatureMessage (String deviceName, Double temperature){
         executor.execute(() -> chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device "
                 + deviceName + " is getting hot!\nCurrent temperature "
-                + String.format("%.4f", temperature)  + " degrees Celsius"))));
+                + String.format(Locale.US,"%.2f", temperature)  + " degrees Celsius"))));
     }
 
     public void sendLeavingPerimeterMessage (String deviceName) {
