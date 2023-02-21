@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,7 +25,7 @@ public class DeviceService {
     public final DeviceRepo deviceRepo;
     public final AssetRepo assetRepo;
     public final TgBot bot;
-
+    private final Logger logger = LogManager.getLogger(DeviceService.class);
     public List<DeviceModel> getAllDevices(){
         return deviceRepo.findAll();
     }
@@ -81,7 +83,10 @@ public class DeviceService {
         if(device.getRelatedAsset() != null){
             boolean isDeviceInPerimeter = checkIfDeviceInAssetPerimeter(device.getRelatedAsset().getPerimeter(), latitude, longitude);
             if (!isDeviceInPerimeter && device.getIsInAssetPerimeter())
+            {
+                logger.info("Device left the perimeter");
                 bot.sendLeavingPerimeterMessage(device.getName());
+            }
             device.setIsInAssetPerimeter(isDeviceInPerimeter);
         }
         deviceRepo.save(device);

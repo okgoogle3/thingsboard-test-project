@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 @Getter
 @Setter
 public class TgBot {
-    private Logger logger = LogManager.getLogger();
+    private Logger logger = LogManager.getLogger(TgBot.class);
     public static TelegramBot bot = new TelegramBot("6116276576:AAEurzwvN0eUyps8aGomnw8Xwn6Tqwp78Sk");
     public Set<Long> chat_id = new HashSet<>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -33,7 +33,7 @@ public class TgBot {
             Long id;
             for (Update update : updates) {
                 id = update.message().chat().id();
-                logger.info("New message from "+ update.message().chat().username());
+                logger.trace("New message from "+ update.message().chat().username());
                 if(update.message().text().equals("/subscribe")) {
                     if (chat_id.contains(id)) bot.execute(new SendMessage(id, "You are a subscriber."));
                     else {
