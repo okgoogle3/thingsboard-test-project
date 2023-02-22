@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,10 +25,16 @@ public class UserModel {
     private String username;
     private String password;
 
-    //@ManyToMany(fetch = FetchType.EAGER)
-    //private Set<RoleModel> roles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<RoleModel> roles = new HashSet<>();
 
     @JsonManagedReference(value = "user-asset-relation")
     @OneToMany(mappedBy = "relatedUser", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<AssetModel> asset = new ArrayList<>();
+
+    public UserModel(String username, String password, Set<RoleModel> roles) {
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+    }
 }
