@@ -1,6 +1,8 @@
 package com.example.MyProject.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +23,12 @@ public class AssetModel {
     private String name;
     private Boolean isActive;
     private String perimeter;
+
+    @Nullable
+    @JsonBackReference(value = "user-asset-relation")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserModel relatedUser;
     @JsonManagedReference(value = "asset-device-relation")
     @OneToMany(mappedBy = "relatedAsset", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<DeviceModel> device = new ArrayList<>();
