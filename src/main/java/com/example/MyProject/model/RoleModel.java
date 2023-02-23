@@ -19,7 +19,7 @@ import java.util.Set;
 @Table(name = "role")
 public class RoleModel {
     @Id
-    private String role;
+    private ERole role;
     @ManyToMany
     private Set<UserModel> users = new HashSet<>();
 }
