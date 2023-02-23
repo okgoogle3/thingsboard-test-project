@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     public final RoleRepo roleRepo;
-    //@PostConstruct
+    @PostConstruct
     public void createRoles(){
         roleRepo.save(new RoleModel(ERole.ROLE_USER));
         roleRepo.save(new RoleModel(ERole.ROLE_ADMIN));
