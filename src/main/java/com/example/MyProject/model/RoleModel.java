@@ -14,7 +14,13 @@ import lombok.Setter;
 @Table(name = "role")
 public class RoleModel {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     @Enumerated(EnumType.STRING)
     private ERole role;
 
+    public RoleModel(ERole role) {
+        this.role = role;
+    }
 }
