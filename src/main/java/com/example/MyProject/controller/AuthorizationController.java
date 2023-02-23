@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.example.MyProject.controller.DTO.Request.LoginDTO;
 import com.example.MyProject.controller.DTO.Request.SignupDTO;
+import com.example.MyProject.controller.DTO.Response.JwtDTO;
 import com.example.MyProject.model.ERole;
 import com.example.MyProject.model.RoleModel;
 import com.example.MyProject.model.UserModel;
@@ -50,26 +51,22 @@ public class AuthorizationController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginDTO loginRequest) {
 
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority).toList();
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
-        return ResponseEntity
-                .ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new UserInfoResponse(userDetails.getId(),
-                        userDetails.getUsername(),
-                        userDetails.getEmail(),
-                        roles)
-                );
+        return ResponseEntity.ok(new JwtDTO(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles));
     }
 
     @PostMapping("/signup")
@@ -111,11 +108,5 @@ public class AuthorizationController {
         userRepo.save(user);
 
         return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser() {
-        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 }

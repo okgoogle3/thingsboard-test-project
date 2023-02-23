@@ -21,13 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig{
     @Autowired
     UserDetailsServiceImpl userDetailsService;
-
-    private final AuthEntryPointJwt unauthorizedHandler;
-
-    public SecurityConfig(AuthEntryPointJwt unauthorizedHandler) {
-        this.unauthorizedHandler = unauthorizedHandler;
-    }
-
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
