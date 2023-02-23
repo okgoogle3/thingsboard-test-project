@@ -8,12 +8,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserDetailsServiceImpl implements UserDetailsService {
     private UserRepo userRepo;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserModel user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("user not found"));
-        return new UserDetailsImpl(user);
+        return UserDetailsImpl.build(user);
     }
 }

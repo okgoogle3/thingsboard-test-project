@@ -1,31 +1,58 @@
 package com.example.MyProject.security;
 
 import com.example.MyProject.model.UserModel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
-    private final UserModel user;
+    private Long id;
 
-    public UserDetailsImpl(UserModel user) {
-        this.user = user;
+    private String username;
+
+    private String email;
+
+    private String password;
+
+    private Collection<? extends GrantedAuthority> authorities;
+    public static UserDetailsImpl build(UserModel user) {
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRole().name()))
+                .collect(Collectors.toList());
+
+        return new UserDetailsImpl(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPassword(),
+                authorities);
     }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorities;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return username;
     }
 
     @Override
