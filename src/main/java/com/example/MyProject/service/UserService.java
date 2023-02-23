@@ -14,7 +14,7 @@ public class UserService {
     @PostConstruct
     public void createRoles(){
         roleRepo.save(new RoleModel(ERole.ROLE_USER));
-        roleRepo.save(new RoleModel(ERole.ROLE_ADMIN));
         roleRepo.save(new RoleModel(ERole.ROLE_MODERATOR));
+        roleRepo.save(new RoleModel(ERole.ROLE_ADMIN));
     }
 }
