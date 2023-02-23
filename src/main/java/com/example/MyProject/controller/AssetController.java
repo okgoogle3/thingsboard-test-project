@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -22,6 +23,7 @@ public class AssetController {
     public final AssetService assetService;
 
     @GetMapping
+    @PreAuthorize("hasRole('USER_ROLE')")
     public ResponseEntity<List<AssetModel>> getAllAssets() {
         return ResponseEntity.ok(assetService.getAllAssets());
     }

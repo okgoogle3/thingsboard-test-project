@@ -28,6 +28,9 @@ public class UserModel {
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<RoleModel> roles = new HashSet<>();
 
     @JsonManagedReference(value = "user-asset-relation")
@@ -38,5 +41,11 @@ public class UserModel {
         this.username = username;
         this.password = password;
         this.roles = roles;
+    }
+
+    public UserModel(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 }
