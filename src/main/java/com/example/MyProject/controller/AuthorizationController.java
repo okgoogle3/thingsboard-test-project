@@ -103,7 +103,6 @@ public class AuthorizationController {
                 }
             });
         }
-
         user.setRoles(roles);
         userRepo.save(user);
 
