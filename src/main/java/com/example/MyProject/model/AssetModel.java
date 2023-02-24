@@ -30,7 +30,7 @@ public class AssetModel {
     @JoinColumn(name = "user_id")
     private UserModel relatedUser;
     @JsonManagedReference(value = "asset-device-relation")
-    @OneToMany(mappedBy = "relatedAsset", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "relatedAsset", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DeviceModel> device = new ArrayList<>();
 
     public AssetModel(String name, String perimeter) {

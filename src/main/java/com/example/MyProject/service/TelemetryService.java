@@ -16,7 +16,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -75,13 +74,7 @@ public class TelemetryService {
     {
         DeviceModel device = deviceRepo.findByName(deviceName).orElseThrow(()->new EntityNotFoundException("Device not found"));
         List<TelemetryModel> telemetry = telemetryRepo.findAllByDeviceAndTimestampAndType(device, startTs, endTs, telemetryType);
-        List<ObjectNode> aggregatedTelemetry = new ArrayList<>();
-        return switch (aggregationFunction) {
-            case MIN -> minValue(startTs, endTs, telemetry, aggregationPeriod, aggregatedTelemetry);
-            case MAX -> maxValue(startTs, endTs, telemetry, aggregationPeriod, aggregatedTelemetry);
-            case SUM -> sumValue(startTs, endTs, telemetry, aggregationPeriod, aggregatedTelemetry);
-            case AVG -> avgValue(startTs, endTs, telemetry, aggregationPeriod, aggregatedTelemetry);
-        };
+        return aggregationValue(startTs, endTs, telemetry, aggregationPeriod, aggregationFunction);
     }
 
     public void getAggregatedTelemetryByAssetInXls(
@@ -108,12 +101,7 @@ public class TelemetryService {
         int rowCounter = 1;
         for(DeviceModel device : devices){
             List<TelemetryModel> telemetry = telemetryRepo.findAllByDeviceAndTimestampAndType(device, startTs, endTs, telemetryType);
-            switch (aggregationFunction){
-                case MIN -> minValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
-                case MAX -> maxValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
-                case SUM -> sumValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
-                case AVG -> avgValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
-            }
+            aggregationValue(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter,  device, aggregationFunction);
         }
         FileOutputStream outputStream = new FileOutputStream(fileLocation);
         workbook.write(outputStream);
@@ -121,235 +109,78 @@ public class TelemetryService {
         workbook.close();
     }
 
-    private List<ObjectNode> minValue (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, List<ObjectNode> aggregatedTelemetry){
+    private void aggregationValue (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, Sheet sheet, int rowCounter, DeviceModel dev, AggregationFunction aggregationFunction){
         while (startTs<endTs){
-            Double minVal = null;
             Long finalStartTs = startTs;
             List<TelemetryModel> currentTelemetry = telemetry.stream()
                     .filter(tm -> tm.getTimestamp() < endTs
                             && tm.getTimestamp() >= finalStartTs
                             && tm.getTimestamp() < finalStartTs + period
                     ).toList();
-            if(new HashSet<>(telemetry).containsAll(currentTelemetry))
-            {
-                if (currentTelemetry.size()==0) {
-                    startTs += period;
-                    continue;
-                }
-                else {
-                    minVal = currentTelemetry.get(0).getValue();
-                    for(TelemetryModel tm : currentTelemetry) minVal = (minVal<=tm.getValue()) ? minVal : tm.getValue();
-                }
+            if (currentTelemetry.size()==0) {
+                startTs += period;
+                continue;
             }
-            ObjectNode node = mapper.createObjectNode();
-            node.put(startTs.toString(), minVal);
-            aggregatedTelemetry.add(mapper.valueToTree(node));
-            startTs += period;
-        }
-        return aggregatedTelemetry;
-    }
-
-    private List<ObjectNode> maxValue (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, List<ObjectNode> aggregatedTelemetry){
-        while (startTs<endTs){
-            Double maxVal = null;
-            Long finalStartTs = startTs;
-            List<TelemetryModel> currentTelemetry = telemetry.stream()
-                    .filter(tm -> tm.getTimestamp() < endTs
-                            && tm.getTimestamp() >= finalStartTs
-                            && tm.getTimestamp() < finalStartTs + period
-                    ).toList();
-            if(new HashSet<>(telemetry).containsAll(currentTelemetry))
-            {
-                if (currentTelemetry.size()==0) {
-                    startTs += period;
-                    continue;
-                }
-                else {
-                    maxVal = currentTelemetry.get(0).getValue();
-                    for(TelemetryModel tm : currentTelemetry) maxVal = (maxVal>=tm.getValue()) ? maxVal : tm.getValue();
-                }
-            }
-            ObjectNode node = mapper.createObjectNode();
-            node.put(startTs.toString(), maxVal);
-            aggregatedTelemetry.add(mapper.valueToTree(node));
-            startTs += period;
-        }
-        return aggregatedTelemetry;
-    }
-    private List<ObjectNode> sumValue (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, List<ObjectNode> aggregatedTelemetry){
-        while (startTs<endTs){
-            Double sum = 0.0;
-            Long finalStartTs = startTs;
-            List<TelemetryModel> currentTelemetry = telemetry.stream()
-                    .filter(tm -> tm.getTimestamp() < endTs
-                            && tm.getTimestamp() >= finalStartTs
-                            && tm.getTimestamp() < finalStartTs + period
-                    ).toList();
-            if(new HashSet<>(telemetry).containsAll(currentTelemetry))
-            {
-                if (currentTelemetry.size()==0) {
-                    startTs += period;
-                    continue;
-                }
-                else {
-                    for(TelemetryModel tm : currentTelemetry) sum += tm.getValue();
-                }
-            }
-            ObjectNode node = mapper.createObjectNode();
-            node.put(startTs.toString(), sum);
-            aggregatedTelemetry.add(mapper.valueToTree(node));
-            startTs += period;
-        }
-        return aggregatedTelemetry;
-    }
-    private List<ObjectNode> avgValue (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, List<ObjectNode> aggregatedTelemetry){
-        while (startTs<endTs){
-            Double sum = 0.0;
-            Long finalStartTs = startTs;
-            List<TelemetryModel> currentTelemetry = telemetry.stream()
-                    .filter(tm -> tm.getTimestamp() < endTs
-                            && tm.getTimestamp() >= finalStartTs
-                            && tm.getTimestamp() < finalStartTs + period
-                    ).toList();
-            if(new HashSet<>(telemetry).containsAll(currentTelemetry))
-            {
-                if (currentTelemetry.size()==0) {
-                    startTs += period;
-                    continue;
-                }
-                else {
-                    for(TelemetryModel tm : currentTelemetry) sum += tm.getValue();
-                }
-            }
-            ObjectNode node = mapper.createObjectNode();
-            node.put(startTs.toString(), sum/currentTelemetry.size());
-            aggregatedTelemetry.add(mapper.valueToTree(node));
-            startTs += period;
-        }
-        return aggregatedTelemetry;
-    }
-
-    private void minValueInXls (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, Sheet sheet, int rowCounter, DeviceModel dev){
-        while (startTs<endTs){
-            Double minVal = null;
-            Long finalStartTs = startTs;
-            List<TelemetryModel> currentTelemetry = telemetry.stream()
-                    .filter(tm -> tm.getTimestamp() < endTs
-                            && tm.getTimestamp() >= finalStartTs
-                            && tm.getTimestamp() < finalStartTs + period
-                    ).toList();
-            if(new HashSet<>(telemetry).containsAll(currentTelemetry))
-            {
-                if (currentTelemetry.size()==0) {
-                    startTs += period;
-                    continue;
-                }
-                else {
-                    minVal = currentTelemetry.get(0).getValue();
-                    for(TelemetryModel tm : currentTelemetry) minVal = (minVal<=tm.getValue()) ? minVal : tm.getValue();
-                }
-            }
+            Double val = calculatedValue(currentTelemetry, aggregationFunction);
             Row row = sheet.createRow(rowCounter);
-            Cell cell = row.createCell(0);
-            cell.setCellValue(dev.getName());
-            cell = row.createCell(1);
-            cell.setCellValue(startTs);
-            cell = row.createCell(2);
-            cell.setCellValue(minVal);
+            setCellValue(row, dev.getName(), startTs, val);
             rowCounter++;
             startTs += period;
         }
     }
 
-    private void maxValueInXls (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, Sheet sheet, int rowCounter, DeviceModel dev){
+    private List<ObjectNode> aggregationValue (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, AggregationFunction aggregationFunction){
+        List<ObjectNode> aggregatedTelemetry = new ArrayList<>();
         while (startTs<endTs){
-            Double maxVal = null;
             Long finalStartTs = startTs;
             List<TelemetryModel> currentTelemetry = telemetry.stream()
                     .filter(tm -> tm.getTimestamp() < endTs
                             && tm.getTimestamp() >= finalStartTs
                             && tm.getTimestamp() < finalStartTs + period
                     ).toList();
-            if(new HashSet<>(telemetry).containsAll(currentTelemetry))
-            {
-                if (currentTelemetry.size()==0) {
-                    startTs += period;
-                    continue;
-                }
-                else {
-                    maxVal = currentTelemetry.get(0).getValue();
-                    for(TelemetryModel tm : currentTelemetry) maxVal = (maxVal>=tm.getValue()) ? maxVal : tm.getValue();
-                }
+            if (currentTelemetry.size()==0) {
+                startTs += period;
+                continue;
             }
-            Row row = sheet.createRow(rowCounter);
-            Cell cell = row.createCell(0);
-            cell.setCellValue(dev.getName());
-            cell = row.createCell(1);
-            cell.setCellValue(startTs);
-            cell = row.createCell(2);
-            cell.setCellValue(maxVal);
-            rowCounter++;
+            Double val = calculatedValue(currentTelemetry, aggregationFunction);
+            ObjectNode node = mapper.createObjectNode();
+            node.put(startTs.toString(), val);
+            aggregatedTelemetry.add(mapper.valueToTree(node));
             startTs += period;
         }
+        return aggregatedTelemetry;
     }
-    private void sumValueInXls (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, Sheet sheet, int rowCounter, DeviceModel dev){
-        while (startTs<endTs){
-            Double sum = 0.0;
-            Long finalStartTs = startTs;
-            List<TelemetryModel> currentTelemetry = telemetry.stream()
-                    .filter(tm -> tm.getTimestamp() < endTs
-                            && tm.getTimestamp() >= finalStartTs
-                            && tm.getTimestamp() < finalStartTs + period
-                    ).toList();
-            if(new HashSet<>(telemetry).containsAll(currentTelemetry))
-            {
-                if (currentTelemetry.size()==0) {
-                    startTs += period;
-                    continue;
-                }
-                else {
-                    for(TelemetryModel tm : currentTelemetry) sum += tm.getValue();
-                }
-            }
-            Row row = sheet.createRow(rowCounter);
-            Cell cell = row.createCell(0);
-            cell.setCellValue(dev.getName());
-            cell = row.createCell(1);
-            cell.setCellValue(startTs);
-            cell = row.createCell(2);
-            cell.setCellValue(sum);
-            rowCounter++;
-            startTs += period;
-        }
+    private void setCellValue(Row row, String deviceName, Long startTime, Double value){
+        Cell cell = row.createCell(0);
+        cell.setCellValue(deviceName);
+        cell = row.createCell(1);
+        cell.setCellValue((new Date(startTime)).toString());
+        cell = row.createCell(2);
+        cell.setCellValue(value);
     }
-    private void avgValueInXls (Long startTs, Long endTs, List<TelemetryModel> telemetry, Long period, Sheet sheet, int rowCounter, DeviceModel dev){
-        while (startTs<endTs){
-            Double sum = 0.0;
-            Long finalStartTs = startTs;
-            List<TelemetryModel> currentTelemetry = telemetry.stream()
-                    .filter(tm -> tm.getTimestamp() < endTs
-                            && tm.getTimestamp() >= finalStartTs
-                            && tm.getTimestamp() < finalStartTs + period
-                    ).toList();
-            if(new HashSet<>(telemetry).containsAll(currentTelemetry))
-            {
-                if (currentTelemetry.size()==0) {
-                    startTs += period;
-                    continue;
-                }
-                else {
-                    for(TelemetryModel tm : currentTelemetry) sum += tm.getValue();
-                }
+
+    private Double calculatedValue(List<TelemetryModel> telemetry, AggregationFunction func){
+        Double val=0.0;
+        switch (func) {
+            case MIN -> {
+                val = telemetry.get(0).getValue();
+                for(TelemetryModel tm : telemetry) val = (val <= tm.getValue()) ? val : tm.getValue();
+                return val;
             }
-            Row row = sheet.createRow(rowCounter);
-            Cell cell = row.createCell(0);
-            cell.setCellValue(dev.getName());
-            cell = row.createCell(1);
-            cell.setCellValue(startTs);
-            cell = row.createCell(2);
-            cell.setCellValue(sum/currentTelemetry.size());
-            rowCounter++;
-            startTs += period;
+            case MAX -> {
+                val = telemetry.get(0).getValue();
+                for(TelemetryModel tm : telemetry) val = (val >= tm.getValue()) ? val : tm.getValue();
+                return val;
+            }
+            case SUM -> {
+                for(TelemetryModel tm : telemetry) val += tm.getValue();
+                return val;
+            }
+            case AVG -> {
+                for(TelemetryModel tm : telemetry) val += tm.getValue();
+                return val/telemetry.size();
+            }
         }
+        return val;
     }
 }
