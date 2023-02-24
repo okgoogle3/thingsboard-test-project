@@ -30,6 +30,5 @@ public class UserController {
         }catch (EntityNotFoundException e){
             return ResponseEntity.badRequest().body("User not found");
         }
-
     }
 }

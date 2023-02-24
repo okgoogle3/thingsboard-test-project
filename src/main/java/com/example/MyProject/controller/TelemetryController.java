@@ -2,10 +2,8 @@ package com.example.MyProject.controller;
 
 import com.example.MyProject.controller.DTO.Request.TelemetryAggregationDTO;
 import com.example.MyProject.controller.DTO.Request.TelemetryHexDTO;
-import com.example.MyProject.model.DeviceModel;
 import com.example.MyProject.model.TelemetryModel;
 import com.example.MyProject.service.TelemetryService;
-import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

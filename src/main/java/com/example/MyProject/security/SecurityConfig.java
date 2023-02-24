@@ -54,8 +54,9 @@ public class SecurityConfig{
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests().requestMatchers("/auth").permitAll()
-                .requestMatchers("/**").hasAnyRole()
+                .authorizeHttpRequests()
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/**").hasAnyRole("USER", "MODERATOR", "ADMIN")
                 .anyRequest().authenticated();
 
         http.authenticationProvider(authenticationProvider());
@@ -64,43 +65,4 @@ public class SecurityConfig{
 
         return http.build();
     }
-    /*@Autowired
-    private DataSource dataSource;
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/asset").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin((form) -> form
-                        .loginPage("/login")
-                        .permitAll()
-                )
-                .logout(LogoutConfigurer::permitAll);
-
-        return http.build();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        User.UserBuilder userFactory =
-                User.builder();
-        UserDetails user = userFactory.username("user0002")
-                .password("password")
-                .roles("USER")
-                .build();
-        UserDetails admin = userFactory.username("user0002")
-                .password("password")
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }*/
 }

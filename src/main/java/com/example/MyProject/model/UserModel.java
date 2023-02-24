@@ -1,7 +1,5 @@
 package com.example.MyProject.model;
 
-import com.example.MyProject.model.CompositeKey.TelemetryId;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
