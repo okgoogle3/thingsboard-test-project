@@ -54,14 +54,21 @@ public class TgBot {
     }
 
     public void sendTemperatureMessage (String deviceName, Double temperature){
-        executor.execute(() -> chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device "
-                + deviceName + " is getting hot!\nCurrent temperature "
-                + String.format(Locale.US,"%.2f", temperature)  + " degrees Celsius"))));
+        try{
+            executor.execute(() -> chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device "
+                    + deviceName + " is getting hot!\nCurrent temperature "
+                    + String.format(Locale.US,"%.2f", temperature)  + " degrees Celsius"))));
+        }catch (Exception ignored){
+
+        }
     }
 
     public void sendLeavingPerimeterMessage (String deviceName) {
-        executor.execute(() -> chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device "
-                + deviceName + " leaving perimeter"))));
+        try{
+            executor.execute(() -> chat_id.forEach(id -> bot.execute(new SendMessage(id, "Device "
+                    + deviceName + " leaving perimeter"))));
+        }catch (Exception ignored){
+        }
     }
 
 }

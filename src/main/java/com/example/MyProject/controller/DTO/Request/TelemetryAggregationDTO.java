@@ -7,7 +7,7 @@ import java.util.Locale;
 
 @Data
 public class TelemetryAggregationDTO {
-    private String deviceName;
+    private String name;
     private String type;
     private Long startTs;
     private Long endTs;

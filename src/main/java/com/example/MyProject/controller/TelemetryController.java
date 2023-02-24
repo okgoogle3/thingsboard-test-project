@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -31,9 +32,21 @@ public class TelemetryController {
     @GetMapping("/device")
     public ResponseEntity<List<ObjectNode>> getAggregatedTelemetryByDevice(@RequestBody TelemetryAggregationDTO tm){
         List<ObjectNode> telemetry = telemetryService
-                .getAggregatedTelemetryByDevice(tm.getDeviceName(), tm.getType(), tm.getStartTs(),
+                .getAggregatedTelemetryByDevice(tm.getName(), tm.getType(), tm.getStartTs(),
                         tm.getEndTs(), tm.getAggregationPeriod(), tm.getAggregationFunction());
         return ResponseEntity.ok(telemetry);
+    }
+
+    @GetMapping("/asset")
+    public ResponseEntity<Void> getAggregatedTelemetryByAssetInXls(@RequestBody TelemetryAggregationDTO tm){
+        try {
+            telemetryService.getAggregatedTelemetryByAssetInXls(tm.getName(), tm.getType(), tm.getStartTs(),
+                    tm.getEndTs(), tm.getAggregationPeriod(), tm.getAggregationFunction());
+        }catch (IOException e){
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     /*@GetMapping("/asset")
