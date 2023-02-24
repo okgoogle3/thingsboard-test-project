@@ -66,7 +66,7 @@ public class DeviceService {
     public void deleteDeviceByName(String name){
         DeviceModel device = deviceRepo.findByName(name).orElseThrow(() -> new EntityNotFoundException("Device not found"));
         device.setRelatedAsset(null);
-        deviceRepo.save(device);
+        deviceRepo.delete(device);
     }
 
     public void deleteDevices(){

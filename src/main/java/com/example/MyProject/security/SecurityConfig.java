@@ -54,7 +54,8 @@ public class SecurityConfig{
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests().requestMatchers("/**").permitAll()
+                .authorizeHttpRequests().requestMatchers("/auth").permitAll()
+                .requestMatchers("/**").hasAnyRole()
                 .anyRequest().authenticated();
 
         http.authenticationProvider(authenticationProvider());

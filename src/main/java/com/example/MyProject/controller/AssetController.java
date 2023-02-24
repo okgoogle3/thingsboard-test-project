@@ -23,7 +23,6 @@ public class AssetController {
     public final AssetService assetService;
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<AssetModel>> getAllAssets() {
         return ResponseEntity.ok(assetService.getAllAssets());
     }
