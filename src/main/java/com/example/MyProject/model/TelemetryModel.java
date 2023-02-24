@@ -25,7 +25,6 @@ public class TelemetryModel {
     private String type;
     private Double value;
 
-
     public TelemetryModel(DeviceModel device, String type, Double value) {
         this.timestamp = System.currentTimeMillis();
         this.type = type;
