@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -92,8 +93,8 @@ public class TelemetryService {
             AggregationFunction aggregationFunction) throws IOException {
         File currDir = new File(".");
         String path = currDir.getAbsolutePath();
-        String fileLocation = path.substring(0, path.length() - 1) + "temp.xls";
-        Workbook workbook = new HSSFWorkbook();
+        String fileLocation = path.substring(0, path.length() - 1) + assetName + ".xlsx";
+        Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(assetName);
         Row header = sheet.createRow(0);
         Cell headerCell = header.createCell(0);
@@ -108,14 +109,15 @@ public class TelemetryService {
         for(DeviceModel device : devices){
             List<TelemetryModel> telemetry = telemetryRepo.findAllByDeviceAndTimestampAndType(device, startTs, endTs, telemetryType);
             switch (aggregationFunction){
-                case MIN: minValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
-                case MAX: maxValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
-                case SUM: sumValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
-                case AVG: avgValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
+                case MIN -> minValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
+                case MAX -> maxValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
+                case SUM -> sumValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
+                case AVG -> avgValueInXls(startTs, endTs, telemetry, aggregationPeriod, sheet, rowCounter, device);
             }
         }
         FileOutputStream outputStream = new FileOutputStream(fileLocation);
         workbook.write(outputStream);
+        outputStream.close();
         workbook.close();
     }
 
